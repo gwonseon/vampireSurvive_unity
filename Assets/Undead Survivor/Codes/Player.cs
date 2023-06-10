@@ -9,7 +9,11 @@ public class Player : MonoBehaviour
     public float speed;
     public Scanner scanner;
     public Hand[] hands;
+    public RuntimeAnimatorController[] animCon;
 
+    //lava
+    public bool isOnLava;
+    public bool isOnIce;
 
     Rigidbody2D rigid;
     SpriteRenderer spriter;
@@ -23,6 +27,42 @@ public class Player : MonoBehaviour
         scanner = GetComponent<Scanner>();
         hands = GetComponentsInChildren<Hand>(true);    //true 넣으면 비활성화한 애들도 사용가능
     }
+
+    void OnEnable()
+    {
+        speed *= Character.Speed;
+        anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
+        //swamp 속도 초기값 설정
+        GameManager.instance.swamp.player_speed = speed;
+        GameManager.instance.swamp1.player_speed = speed;
+        GameManager.instance.swamp2.player_speed = speed;
+        GameManager.instance.swamp3.player_speed = speed;
+        GameManager.instance.swamp.true_speed = speed;
+        GameManager.instance.swamp1.true_speed = speed;
+        GameManager.instance.swamp2.true_speed = speed;
+        GameManager.instance.swamp3.true_speed = speed;
+        GameManager.instance.lava0.player_speed = speed;
+        GameManager.instance.lava1.player_speed = speed;
+        GameManager.instance.lava2.player_speed = speed;
+        GameManager.instance.lava3.player_speed = speed;
+        GameManager.instance.lava0.true_speed = speed;
+        GameManager.instance.lava1.true_speed = speed;
+        GameManager.instance.lava2.true_speed = speed;
+        GameManager.instance.lava3.true_speed = speed;
+        GameManager.instance.ice1.player_speed = speed;
+        GameManager.instance.ice2.player_speed = speed;
+        GameManager.instance.ice3.player_speed = speed;
+        GameManager.instance.ice4.player_speed = speed;
+        GameManager.instance.ice1.true_speed = speed;
+        GameManager.instance.ice2.true_speed = speed;
+        GameManager.instance.ice3.true_speed = speed;
+        GameManager.instance.ice4.true_speed = speed;
+
+
+
+
+    }
+
 
     void Update()
     {
@@ -66,9 +106,13 @@ public class Player : MonoBehaviour
         if (!GameManager.instance.isLive)
             return;
 
-        GameManager.instance.health -= Time.deltaTime * 10;
+        if(collision.transform.tag == "Enemy")
+            GameManager.instance.health -= Time.deltaTime * 10;
 
-        if( GameManager.instance.health < 0)
+        if (collision.transform.tag == "Trap")
+            GameManager.instance.health -= Time.deltaTime * 10;
+
+        if (GameManager.instance.health < 0)
         {
             for ( int index = 2; index < transform.childCount; index++)
             {
@@ -81,4 +125,5 @@ public class Player : MonoBehaviour
         }
 
     }
+
 }

@@ -8,11 +8,17 @@ TagManager:
   - Area
   - Enemy
   - Bullet
+  - Cave
+  - Swamp
+  - Lava
+  - Ice
+  - Snow
+  - Trap
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - BackGround
   - Water
   - UI
   - Enemy

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ public class Item : MonoBehaviour
     public int level;
     public Weapon weapon;
     public Gear gear;
-
+    private Player player;
     Image icon;
     Text textLevel;
     Text textName;
@@ -35,6 +36,8 @@ public class Item : MonoBehaviour
         {
             case ItemData.ItemType.Melee:
             case ItemData.ItemType.Range:
+            case ItemData.ItemType.Sickle:
+            case ItemData.ItemType.Shotgun:
                 textDesc.text = string.Format(data.itemDesc, data.damages[level] * 100, data.counts[level]);  // µ¥¹ÌÁö »ó½ÂÀ» º¸¿©ÁÙ ¶© °öÇÏ±â 100
                 break;
             case ItemData.ItemType.Glove:
@@ -47,7 +50,10 @@ public class Item : MonoBehaviour
         }
     }
 
-
+    private void Start()
+    {
+       player =  GameManager.instance.player;
+    }
 
     public void OnClick()
     {
@@ -55,6 +61,8 @@ public class Item : MonoBehaviour
         {
             case ItemData.ItemType.Melee:
             case ItemData.ItemType.Range:
+            case ItemData.ItemType.Sickle:
+            case ItemData.ItemType.Shotgun:
                 if ( level == 0)
                 {
                     GameObject newWeapon = new GameObject();
@@ -75,7 +83,7 @@ public class Item : MonoBehaviour
                 break;
             case ItemData.ItemType.Glove:
             case ItemData.ItemType.Shoe:
-                if ( level == 0)
+                if (level == 0)
                 {
                     GameObject newGear = new GameObject();
                     gear = newGear.AddComponent<Gear>();
@@ -87,7 +95,7 @@ public class Item : MonoBehaviour
                     gear.LevelUp(nextRate);
                 }
                 level++;
-
+        
                 break;
             case ItemData.ItemType.Heal:
                 GameManager.instance.health = GameManager.instance.maxHealth;

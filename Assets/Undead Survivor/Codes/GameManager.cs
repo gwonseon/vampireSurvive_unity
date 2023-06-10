@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public float gameTime;
     public float maxGameTime = 2 * 10f;
     [Header("# Player Info")]
+    public int playerId;
     public float health;
     public float maxHealth = 100;
     public int level;
@@ -25,17 +26,37 @@ public class GameManager : MonoBehaviour
     public LevelUp uiLevelUp;
     public Result uiResult;
     public GameObject enemyCleaner;
+    //swamp 추가 다른 맵에는 dummy_swamp로 설정
+    public Swamp swamp;
+    public Swamp swamp1;
+    public Swamp swamp2;
+    public Swamp swamp3;
+    public Lava lava0;
+    public Lava lava1;
+    public Lava lava2;
+    public Lava lava3;
+    public Ice ice1;
+    public Ice ice2;
+    public Ice ice3;
+    public Ice ice4;
+
 
     void Awake()
     {
         instance = this;
     }
-
-    public void GameStart()
+ 
+    public void GameStart(int id)
     {
+        playerId = id;
         health = maxHealth;
-        uiLevelUp.Select(0);  // 임시 스크립트 (첫번째 캐릭터 선택)
+
+        player.gameObject.SetActive(true);
+        uiLevelUp.Select(playerId % 2);  // 임시 스크립트 (첫번째 캐릭터 선택)
         Resume();
+
+        AudioManager.instance.PlayBgm(true);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);//효과음을 재생할 부분마다 재생함수 호출
     }
 
     public void GameOver()
@@ -50,6 +71,9 @@ public class GameManager : MonoBehaviour
         uiResult.gameObject.SetActive(true);
         uiResult.Lose();
         Stop();
+
+        AudioManager.instance.PlayBgm(false);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Lose);
     }
 
     public void GameVictory()
@@ -66,6 +90,9 @@ public class GameManager : MonoBehaviour
         uiResult.gameObject.SetActive(true);
         uiResult.Win();
         Stop();
+
+        AudioManager.instance.PlayBgm(false);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Win);
     }
 
 
@@ -101,6 +128,22 @@ public class GameManager : MonoBehaviour
             uiLevelUp.Show();
         }
     }
+
+    public void TakeDamage(float damageAmount)//지속 데미지
+    {
+        if(!isLive) 
+            return;
+
+        health -= damageAmount;
+
+        if(health <= 0)
+        {
+            health = 0;
+            GameOver();
+        }
+
+    }
+
 
     // 레벨업시 시간정지
     public void Stop()

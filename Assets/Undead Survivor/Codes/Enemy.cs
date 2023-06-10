@@ -8,6 +8,8 @@ public class Enemy : MonoBehaviour
     public float speed;
     public float health;
     public float maxHealth;
+    public float timer;
+    public bool dead_timer;
     public RuntimeAnimatorController[] animCon;
     public Rigidbody2D target;
 
@@ -41,7 +43,6 @@ public class Enemy : MonoBehaviour
         rigid.MovePosition(rigid.position + nextVec);
         rigid.velocity = Vector2.zero;
     }
-
     void LateUpdate()
     {
         if (!GameManager.instance.isLive)
@@ -49,7 +50,7 @@ public class Enemy : MonoBehaviour
 
         if (!isLive)
             return;
-        spriter.flipX = target.position.x < rigid.position.x;   
+        spriter.flipX = target.position.x < rigid.position.x;
     }
 
     void OnEnable() {
@@ -60,6 +61,8 @@ public class Enemy : MonoBehaviour
         spriter.sortingOrder = 2;
         anim.SetBool("Dead", false);
         health = maxHealth;
+        dead_timer = false;
+        timer = 0;
     }
 
     public void Init(SpawnData data) {
@@ -79,6 +82,7 @@ public class Enemy : MonoBehaviour
         if (health > 0) {
             // .. Live, Hit Action
             anim.SetTrigger("Hit");
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Hit);
 
         } else {
             // .. Die
@@ -89,6 +93,10 @@ public class Enemy : MonoBehaviour
             anim.SetBool("Dead", true);
             GameManager.instance.kill++;
             GameManager.instance.GetExp();
+            dead_timer = true;
+
+            if (GameManager.instance.isLive)//언데드 사망 사운드는 게임 종료 시에는 나지 않도록 조건 추가
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
         }
     }
 
@@ -97,10 +105,22 @@ public class Enemy : MonoBehaviour
 
         Vector3 playerPos = GameManager.instance.player.transform.position;
         Vector3 dirVec = transform.position - playerPos;
-        rigid.AddForce(dirVec.normalized * 3, ForceMode2D.Impulse);
+        rigid.AddForce(dirVec.normalized * 2, ForceMode2D.Impulse);
     }
 
     void Dead() {
         gameObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (dead_timer == true)
+        {
+            timer = timer + Time.deltaTime;
+            if (timer > 3)
+            {
+                gameObject.SetActive(false);
+            }
+        }
     }
 }

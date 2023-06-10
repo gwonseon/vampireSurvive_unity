@@ -6,7 +6,8 @@ public class LevelUp : MonoBehaviour
 {
     RectTransform rect;
     Item[] items;
-
+    Player player;
+    SpriteRenderer spriteRightHand;
 
     void Awake()
     {
@@ -19,12 +20,16 @@ public class LevelUp : MonoBehaviour
         Next();
         rect.localScale = Vector3.one;
         GameManager.instance.Stop();
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+        AudioManager.instance.EffectBgm(true);
     }
 
     public void Hide()
     {
         rect.localScale = Vector3.zero;
         GameManager.instance.Resume();
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
+        AudioManager.instance.EffectBgm(false);
     }
 
     public void Select(int index)
@@ -48,6 +53,20 @@ public class LevelUp : MonoBehaviour
             ran[0] = Random.Range(0, items.Length);
             ran[1] = Random.Range(0, items.Length);
             ran[2] = Random.Range(0, items.Length);
+
+            player = GameManager.instance.player;
+            if (player.transform.Find("Hand Right"))
+            {
+                spriteRightHand = player.transform.Find("Hand Right").GetComponent<SpriteRenderer>();
+                if (spriteRightHand.sprite == null) // 총을 안들었을 경우
+                {
+                     // .. nothing
+                }
+                else if (spriteRightHand.sprite.name == "Weapon 5" && (ran[0] == 1 || ran[1] == 1 || ran[2] == 1)) // 무기가 산탄총인데 엽총 업그레이드가 나올 경우
+                    continue;
+                else if (spriteRightHand.sprite.name == "Weapon 3" && (ran[0] == 6 || ran[1] == 6 || ran[2] == 6)) // 무기가 엽총인데 산탄총 업그레이드가 나올 경우
+                    continue;
+            }
 
             if (ran[0] != ran[1] && ran[1] != ran[2] && ran[0] != ran[2])    // 서로 비교하여 모두 같지 않으면 반복문 빠져나감
                 break;
